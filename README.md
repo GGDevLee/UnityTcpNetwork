@@ -1,0 +1,2 @@
+# UnityTcpNetwork
+Unity超高性能异步Tcp网络库，使用IOCP网络模型，完成封装SocketAsyncEventArgs，Socket套接字，使得高性能网络连接更简单！
