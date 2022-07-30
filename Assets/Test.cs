@@ -17,7 +17,7 @@ public class Test : MonoBehaviour
 
         _TcpNetwork = new TcpNetwork(point);
 
-        TcpNetwork.onConnect = (state, value) =>
+        _TcpNetwork.onConnect = (state, value) =>
         {
             if (state)
             {
@@ -29,7 +29,7 @@ public class Test : MonoBehaviour
             }
         };
 
-        TcpNetwork.onDisconnect = (state, value) =>
+        _TcpNetwork.onDisconnect = (state, value) =>
         {
             if (state)
             {
@@ -41,7 +41,7 @@ public class Test : MonoBehaviour
             }
         };
 
-        TcpNetwork.onReceive = (state, buff) =>
+        _TcpNetwork.onReceive = (state, buff) =>
         {
 
             if (state)
@@ -61,7 +61,7 @@ public class Test : MonoBehaviour
             }
         };
 
-        TcpNetwork.onSend = (state, value) =>
+        _TcpNetwork.onSend = (state, value) =>
           {
               if (state)
               {

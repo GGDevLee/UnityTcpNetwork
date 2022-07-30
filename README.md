@@ -1,5 +1,7 @@
 # TcpNetwork
 
+**联系作者：419731519（QQ）**
+
 ### =================TcpNetwork介绍=================
 #### 笔者一直寻求一种异步高性能的网络通讯方式，而在.Net中，微软提供了SocketAsyncEventArgs来实现IOCP
 #### 关于IOCP的优点，笔者不过多阐述，我这里对SocketAsyncEventArgs，Socket进行完整的封装，直接监听即可连接，发送，接收数据等
@@ -18,11 +20,11 @@
 #### 以确保服务器所收到的消息，是有序
 
 ### =================使用方法=================
-- manifest.json中添加插件路径
+- manifest.json中添加插件路径 或 直接引用Release内的dll（二选一）
 ```json
 {
   "dependencies": {
-	"com.leeframework.tcpnetwork":"https://e.coding.net/ggdevlee/leeframework/TcpNetwork.git#1.0.0"
+	"com.leeframework.tcpnetwork":"https://e.coding.net/ggdevlee/leeframework/TcpNetwork.git#1.0.1"
   }
 }
 ```
@@ -34,20 +36,23 @@ using LeeFramework.Tcp;
 
 - TcpNetwork初始化
 ```csharp
+private TcpNetwork _TcpNetwork;
 
 private void Start()
-{
-    TcpNetwork.onConnect = (state, args) =>
+{    
+	//ip与端口号
+    _TcpNetwork = new TcpNetwork("127.0.0.1",1000);
+    _TcpNetwork.onConnect = (state, args) =>
     {
         Debug.Log("Connect : " + state.ToString());
     };
     
-    TcpNetwork.onDisconnect = (state, args) =>
+    _TcpNetwork.onDisconnect = (state, args) =>
     {
         Debug.Log("Disconnect : " + state.ToString());
     };
 
-    TcpNetwork.onReceive = (state, buff) =>
+    _TcpNetwork.onReceive = (state, buff) =>
     {
 
         if (state)
@@ -60,7 +65,7 @@ private void Start()
         }
     };
 
-    TcpNetwork.onSend = (state, args) =>
+    _TcpNetwork.onSend = (state, args) =>
     {
         if (state)
         {
@@ -78,15 +83,12 @@ private void Start()
 - 异步连接成功与失败，都会触发到TcpNetwork.onConnect事件
 - 异步连接成功后，会自动接收消息，接收到的消息，都会触发TcpNetwork.onReceive事件
 ```csharp
-private TcpNetwork _TcpNetwork;
 
 public void ConnectAsync()
 {
-    //ip与端口号
-    _TcpNetwork = new TcpNetwork("127.0.0.1",1000);
-    
     _TcpNetwork.ConnectAsync();
 }
+
 ```
 
 - 异步发送消息

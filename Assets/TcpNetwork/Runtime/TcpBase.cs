@@ -19,41 +19,17 @@ namespace LeeFramework.Tcp
         /// <summary>
         /// 事件回调
         /// </summary>
-        public static Action<bool, SocketAsyncEventArgs> onConnect;
-        public static Action<bool, SocketAsyncEventArgs> onDisconnect;
-        public static Action<bool, byte[]> onReceive;
-        public static Action<bool, SocketAsyncEventArgs> onSend;
+        public Action<bool, SocketAsyncEventArgs> onConnect;
+        public Action<bool, SocketAsyncEventArgs> onDisconnect;
+        public Action<bool, byte[]> onReceive;
+        public Action<bool, SocketAsyncEventArgs> onSend;
 
 
 
-        protected Action<bool, SocketAsyncEventArgs> _OnConnect = (state, args) =>
-        {
-            MainThread.instance.Run(() =>
-            {
-                onConnect?.Invoke(state, args);
-            });
-        };
-        protected Action<bool, SocketAsyncEventArgs> _OnDisconnect = (state, args) =>
-        {
-            MainThread.instance.Run(() =>
-            {
-                onDisconnect?.Invoke(state, args);
-            });
-        };
-        protected Action<bool, byte[]> _OnReceive = (state, data) =>
-        {
-            MainThread.instance.Run(() =>
-            {
-                onReceive?.Invoke(state, data);
-            });
-        };
-        protected Action<bool, SocketAsyncEventArgs> _OnSend = (state, args) =>
-        {
-            MainThread.instance.Run(() =>
-            {
-                onSend?.Invoke(state, args);
-            });
-        };
+        protected Action<bool, SocketAsyncEventArgs> _OnConnect;
+        protected Action<bool, SocketAsyncEventArgs> _OnDisconnect;
+        protected Action<bool, byte[]> _OnReceive;
+        protected Action<bool, SocketAsyncEventArgs> _OnSend;
 
 
         protected Socket _Client = null;
@@ -70,6 +46,38 @@ namespace LeeFramework.Tcp
         protected SocketAsyncEventArgs _RecvArgs = new SocketAsyncEventArgs();
         protected SocketAsyncEventArgs _SendArgs = new SocketAsyncEventArgs();
         protected SendItemPool _SendPool = new SendItemPool(20);
+
+        protected void InitCb()
+        {
+            _OnConnect = (state, args) =>
+            {
+                MainThread.instance.Run(() =>
+                {
+                    onConnect?.Invoke(state, args);
+                });
+            };
+            _OnDisconnect = (state, args) =>
+            {
+                MainThread.instance.Run(() =>
+                {
+                    onDisconnect?.Invoke(state, args);
+                });
+            };
+            _OnReceive = (state, data) =>
+            {
+                MainThread.instance.Run(() =>
+                {
+                    onReceive?.Invoke(state, data);
+                });
+            };
+            _OnSend = (state, args) =>
+            {
+                MainThread.instance.Run(() =>
+                {
+                    onSend?.Invoke(state, args);
+                });
+            };
+        }
 
         /// <summary>
         /// 重置接收缓存
@@ -91,6 +99,8 @@ namespace LeeFramework.Tcp
         public abstract void ConnectAsync();
 
         public abstract void SendAsync(byte[] buffer);
+
+        public abstract void Send(byte[] buffer);
 
         public abstract void DisconnectAsync();
 
@@ -114,6 +124,16 @@ namespace LeeFramework.Tcp
         public void Dispose()
         {
             _Client = null;
+
+            onConnect = null;
+            onDisconnect = null;
+            onReceive = null;
+            onSend = null;
+
+            _OnConnect = null;
+            _OnDisconnect = null;
+            _OnReceive = null;
+            _OnSend = null;
 
             _ConnArgs.Dispose();
             _DisconnArgs.Dispose();

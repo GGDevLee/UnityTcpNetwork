@@ -13,16 +13,18 @@ namespace LeeFramework.Tcp
         public TcpNetwork(string ip, int port)
         {
             _IPEndPoint = new IPEndPoint(IPAddress.Parse(ip), port);
-            SetOnComplete();
+            InitCb();
+            InitComplete();
         }
 
         public TcpNetwork(IPEndPoint ip)
         {
             _IPEndPoint = ip;
-            SetOnComplete();
+            InitCb();
+            InitComplete();
         }
 
-        private void SetOnComplete()
+        private void InitComplete()
         {
             _ConnArgs.Completed += OnComplete;
             _DisconnArgs.Completed += OnComplete;
@@ -250,6 +252,36 @@ namespace LeeFramework.Tcp
             {
                 Debug.LogError("发送失败：" + e.ToString());
                 _IsSending = false;
+            }
+        }
+
+        /// <summary>
+        /// 不用经过消息队列，直接发送消息
+        /// </summary>
+        public override void Send(byte[] buffer)
+        {
+            if (_Client == null)
+            {
+                return;
+            }
+
+            if (!_IsConnected)
+            {
+                return;
+            }
+            try
+            {
+                SocketAsyncEventArgs sendArgs = new SocketAsyncEventArgs();
+                sendArgs.SetBuffer(buffer, 0, buffer.Length);
+                sendArgs.Completed += OnComplete;
+                if (!_Client.SendAsync(sendArgs))
+                {
+                    OnSend(sendArgs);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("发送失败：" + e.ToString());
             }
         }
 
